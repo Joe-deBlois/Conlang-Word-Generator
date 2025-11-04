@@ -3,7 +3,7 @@ This is a program for conlangers that randomly generates feasible words given so
 app-initialization.py should be run first; it prompts the user to select between options 1 or 2. 
 
 If option 1 is selected, option1.py will automatically run. This program has two "cells". 
-In the first cell, the user will insert the IPA characters they want in their words and possible syllable structures. Then they will play with sliders to choose the frequency of each phoneme and each syllable structure. These frequencies are initialized with equal allocation, and after the user has moved the sliders and clicked the "finish" button, the frequencies are normalized between 0-100. 
+*In the first cell, the user will insert the IPA characters they want in their words and possible syllable structures. Then they will play with sliders to choose the frequency of each phoneme and each syllable structure. These frequencies are initialized with equal allocation, and after the user has moved the sliders and clicked the "finish" button, the frequencies are normalized between 0-100. 
 * In the second cell, the user will specify the number of words desired and the maximum length of any word. 
 * Finally, the program will output a plaintext file of words chosen via weighted random selection 
 
