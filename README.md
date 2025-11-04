@@ -2,11 +2,10 @@ This is a program for conlangers that randomly generates feasible words given so
 
 app-initialization.py should be run first; it prompts the user to select between options 1 or 2. 
 
-If option 1 is selected, option1.py will automatically run. This program's userface is through tkinter.
-* The user will select IPA characters they want in their words, and the frequency of those sounds. 
-* They will also develop legal syllable structures, and the phoneme frequencies will be used to set frequencies to each syllable. (to do)
-* Then the user will specify the number of words desired and the maximum and minimum length of any word. (to do)
-* Finally the program will output a plaintext file of randomly generated words following these guidelines. (to do)
+If option 1 is selected, option1.py will automatically run. This program has two "cells". 
+In the first cell, the user will insert the IPA characters they want in their words and possible syllable structures. Then they will play with sliders to choose the frequency of each phoneme and each syllable structure. These frequencies are initialized with equal allocation, and after the user has moved the sliders and clicked the "finish" button, the frequencies are normalized between 0-100. 
+* In the second cell, the user will specify the number of words desired and the maximum length of any word. 
+* Finally, the program will output a plaintext file of words chosen via weighted random selection 
 
 If option 2 is selected, option2.py will automatically run. 
 * All the user has to do for this program is input words or a sentence from their conlang, max word length, and the number of words they want. The program specifies some rules on how these words should be inputted. 
