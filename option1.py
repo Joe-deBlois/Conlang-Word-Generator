@@ -1,179 +1,234 @@
-import tkinter as tk
+#%%
+
+import ipywidgets as widgets
+from IPython.display import display
+import matplotlib.pyplot as plt
+import random
 
 
 #-------------------------------------------------------
 #Code for option 1; generated words from selected sounds
 #-------------------------------------------------------
 
-#region === IPA Characters ===
+#possible next steps; make look nicer? Make a popup window with an IPA-chart style image where users can select phonemes, or a textbox for them to insert their own.
+
+
+
+
+
+#region === Phoneme Collection ===
 # List of IPA characters (add more as needed)
 ipa_cons = [["p", "b", "t", "d", "ʈ", "ɖ", "c", "ɟ", "k", "ɡ", "q", "ɢ", "ʔ"], ["m", "ɱ", "n", "ɳ", "ɲ", "ŋ", "ɴ"], ["ʙ", "r", "ʀ"], ["ⱱ", "ɾ", "ɽ"], ["ɸ", "β", "f", "v", "θ", "ð", "s", "z", "ʃ","ʒ", "ʂ", "ʐ", "ç", "ʝ", "x", "ɣ", "χ", "ʁ", "ħ", "ʕ", "h","ɦ"], ["ɬ", "ɮ"], ["ʋ", "ɹ", "ɻ", "j", "ɰ"], ["l", "ɭ", "ʎ", "ʟ"]]
-ipa_vowels = [["i", "y", "ɨ", "ʉ", "ɯ", "u"], ["ɪ", "ʏ", "ʊ"], ["e", "ø","ɘ", "ɵ", "ɤ", "o"], ["ə"], ["ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ"], ["æ", "ɐ"], ["a", "ɶ", "ɑ", "ɒ"]]
+ipa_vowels = ["i", "y", "ɨ", "ʉ", "ɯ", "u", "ɪ", "ʏ", "ʊ", "e", "ø","ɘ", "ɵ", "ɤ", "o", "ə", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ", "ɑ", "ɒ"]
 ipa_clicks = ["ʘ", "ǀ", "ǃ", "ǂ", "ǁ"]
 ipa_affricates = ["d͡ʒ", "t͡ʃ", "t͡s","d͡z", "p͡f", "k͡x"]
 ipa_other = ["pʼ", "tʼ", "kʼ", "sʼ", "ɧ", "ɕ", "ʑ", "ʍ", "w", "ɥ", "ʜ", "ʢ", "ʡ"]
 
-#endregion
+#p’,p,t’,t,ʈ’,ʈ,k’,k,hn̥,hm̥,hŋ̥,ɸ,f,θ,s,ʃ,ʂ,x,ɧ,ǀ,!,ǂ,‖,ḁ͡ɪ,i̥,ɪ̥,u̥,ʊ̥,o̥͡ɪ,ə̥,ḁ͡ɪ˥˩,i̥˥˩,ɪ̥˥˩,u̥˥˩,ʊ̥˥˩,o̥͡ɪ˥˩,ə̥˥˩,ḁ͡ɪ˩˥,i̥˩˥,ɪ̥˩˥,u̥˩˥,ʊ̥˩˥,o̥͡ɪ˩˥,ə̥˩˥
 
-#region === State Management () ===
-# List to hold clicked characters
-selected_chars = []
+print("Text input rules: \n "
+"-Text must be inputted as one string, commas seperating each phoneme, with no spaces\n "
+"-This version does not support diacritics or tones\n "
+"-At this stage, the program will only use phonemes found in your string (it will not extrapolate and use likely novel phonemes)")
 
-#probabilities
-probabilities = {}
-bars = {}
-updating_bars = False 
-#endregion
+selected_phonemes = input("Please input your phonemes here: \n")
 
-#region === Select/Click IPA symbol Method ===
-def selection_click(char):
-    if char in selected_chars:
-        selected_chars.remove(char)
-        probabilities.pop(char, None)
-    else:
-        selected_chars.append(char)
-    probabilities[char] = 100/len(selected_chars)
-    update_bars()
-    display_label.config(text='Sounds in the language: ' + ''.join(selected_chars))
-    # Save
-    with open("selected_ipa.txt", "w", encoding="utf-8") as f:
-        for c in selected_chars:
-            f.write(f"{c}: {probabilities[c]:.2f}%\n")
-#endregion
+selected_phonemes = selected_phonemes.split(",")
+selected_cons = []
+selected_vowels = []
 
-#region === IPA Selection and Frequency Bars ===
-# Create main window and title for window
-window = tk.Tk()
-window.title("Interactive IPA Chart")
-
-# Display label
-display_label = tk.Label(window, text= "Select the sounds in your conlang.")
-display_label = tk.Label(window, text="Selected: ")
-display_label.pack(pady=10)
-
-#endregion
-
-#region === Buttons and Associated Labels ===
-# Create buttons for each IPA character
-#"command = ..." tells the button what to do when clicked
-#"lambda c=char: selection_click(c)" freezes the current character in the loop so it gets passed to the function correctly
-button_frame = tk.Frame(window)
-button_frame.pack()
+for phoneme in selected_phonemes: 
+    for vowel in ipa_vowels: 
+        if vowel in phoneme: 
+            selected_vowels.append(phoneme)
+    if phoneme not in selected_vowels and phoneme not in ["", " ", ",", ".", "'"]: #in case there is 
+        selected_cons.append(phoneme)
 
 
-def show_buttons(char_list, start_row):
-    """shows the buttons of all components for the IPA chart"""
-    if char_list == ipa_cons:
-        title = "Consonants"
-    if char_list == ipa_vowels:
-        title = "Vowels"
-    if char_list == ipa_clicks:
-        title = "Clicks"
-    if char_list == ipa_affricates:
-        title = "Affricates"
-    if char_list == ipa_other:
-        title = "Other Phonemes"
 
-        
-    # Add section title label
-    section_label = tk.Label(button_frame, text=title, font=("Arial", 12, "bold"))
-    section_label.grid(row=start_row, column=0, columnspan=10, pady=(10, 0), sticky="w")
-    start_row += 1  # Move down to start placing buttons
-    
-    if not char_list:
-        return start_row
 
-    for row_index, row in enumerate(char_list):
-        for col_index, char in enumerate(row):
-            btn = tk.Button(button_frame, text=char, width=4, height=2, font = (16),
-                            command=lambda c=char: selection_click(c))
-            btn.grid(row=start_row + row_index, column=col_index, padx=2, pady=2)
 
-    return start_row + len(char_list)  # move down by number of rows added
-
-next_row = 0
-next_row = show_buttons(ipa_cons, next_row)
-next_row = show_buttons(ipa_vowels, next_row)
-next_row = show_buttons(ipa_clicks, next_row)
-#endregion 
-
-#region === Bars and Associated Methods and Labels === 
-def update_bars():
-    # Clear old bars
-    for widget in bars_frame.winfo_children():
-        widget.destroy()
-    bars.clear()
-    
-    for i, char in enumerate(selected_chars):
-        scale = tk.Scale(bars_frame, from_=100, to=0, orient='vertical', length=150, label=char,
-                         command=lambda val, c=char: on_bar_change(c, float(val)))
-        scale.set(probabilities.get(char, 0))
-        scale.grid(row=0, column=i, padx=0)
-        bars[char] = scale
-
-#Display bars using Tkinter scale vertically
-bars_frame = tk.Frame(window)
-bars_frame.pack(pady = 10)
-
-#Handle scale changes by user and keep total = 100
-def on_bar_change(char, new_val):
-    #this little segment ensures that editing any probability bar will redistribute the values of ALL OTHERS
-    global updating_bars
-    if updating_bars:
-        return
-    
-    old_val = probabilities[char]
-    diff = new_val - old_val
-    probabilities[char] = new_val
-    
-    others = [c for c in probabilities if c != char]
-    total_others = sum(probabilities[c] for c in others)
-    
-    # Prevent negative or > 100 total
-    if total_others - diff <= 0:
-        # Set others to zero, char to 100
-        for c in others:
-            probabilities[c] = 0
-        probabilities[char] = 100
-    else:
-        # Adjust others proportionally to keep sum 100
-        for c in others:
-            # reduce/increase others by ratio
-            probabilities[c] = probabilities[c] - (diff * (probabilities[c] / total_others))
-    
-    # Normalize: make sure total == 100
-    total = sum(probabilities.values())
-    if total != 100:
-        correction = 100 - total
-        # Spread correction proportionally over all bars (including the one changed)
-        for c in probabilities:
-            probabilities[c] += correction * (probabilities[c] / total)
-    
-    # Update the scales to reflect new values
-    for c in probabilities:
-        if c != char:
-            bars[c].set(round(probabilities[c], 2))
-    updating_bars = False
-#endregion
 
 
 
 
 #region === Valid Syllables ===
 # number of syllables per word
- #have user select from structures = ["V", "CV", "VC", "CVC", "CCV", "CCVC", "CCCV", "CCCVC", "CVCC", "CCVCC", "CCCVCC", "CVCCC", "CCCVCCC", "VCC", "CCCCVCCCC"] and their frequencies
+selected_syllable_structures_num = input("Please select valid syllables, formatting your answer as a comma-seperated list: \nV : 1, \nCV: 2, \nVC: 3, \nCVC: 4, \nCCV: 5, \nCCVC: 6, \nCCCV: 7, \nCCCVC: 8, \nCVCC: 9, \nCCVCC: 10, \nCCCVCC: 11, \nCVCCC: 12, \nCCCVCCC: 13, \nVCC: 14, \nCCCCVCCCC: 15")
+selected_syllable_structures_num = selected_syllable_structures_num.split(",")
+
+syllable_structure_mapping = {
+    "1": "V",
+    "2": "CV",
+    "3": "VC",
+    "4": "CVC",
+    "5": "CCV",
+    "6": "CCVC",
+    "7": "CCCV",
+    "8": "CCCV C",
+    "9": "CVCC",
+    "10": "CCVCC",
+    "11": "CCCVCC",
+    "12": "CVCCC",
+    "13": "CCCVCCC",
+    "14": "VCC",
+    "15": "CCCCVCCCC"
+}
+
+
+#1,2,3,4,5,6,9,14
+selected_syllable_structures = [] 
+
+def map_nums_to_syllables(ls):
+    for num in ls: 
+        selected_syllable_structures.append(syllable_structure_mapping[num])
+
+map_nums_to_syllables(selected_syllable_structures_num)
+
+
+
 
  #endregion
 
 
+
+
+#frequencies
+#assign a frequency to each phoneme (make bars later)
+#https://kapernikov.com/ipywidgets-with-matplotlib/
+
+frequency_of_cons = {con: 0 for con in selected_cons}
+frequency_of_vowels = {vowel:0 for vowel in selected_vowels}
+frequency_of_syllables = {syll: 0 for syll in selected_syllable_structures}
+
+def determine_frequencies(frequency_dict, label = "Phonemes"): 
+    """
+    Provide the user with interactive frequency bars for each phoneme in the list
+    Normalize when user clicks "finish"
+    """
+ 
+    local_phonemes = list(frequency_dict.keys())
+    if not local_phonemes:
+        print(f"No {label.lower()} selected.")
+        return
+    
+    #initial frequency is equal for all phonemes
+    average = 100/len(local_phonemes)
+
+    #prepare a dictionary to store sliders
+    #like {'b': FloatSlider(...), 'c': FloatSlider(...), etc.}
+    sliders = {
+        ph:widgets.FloatSlider(
+            value = average, 
+            min = 0, 
+                max = 100, 
+                step = 0.1, 
+                description = ph, 
+                continuous_update = False
+        )
+        for ph in local_phonemes
+    }
+
+    output = widgets.Output()
+
+    # Button to finish editing
+    finish_button = widgets.Button(description="✅ Finish", button_style="success")
+
+
+    def normalize_and_plot(change = None):
+        """ Normalize values once user clicks 'finish'"""
+
+        #get current values
+        values = [sl.value for sl in sliders.values()]
+        total = sum(values)
+        normalized = [(v / total) * 100 if total > 0 else 100/len(values) for v in values]
+
+        for ph, val in zip(local_phonemes, normalized):
+            frequency_dict[ph] = val
+
+        with output:
+            output.clear_output(wait=True)
+            fig, ax = plt.subplots(figsize=(6, 3))
+            ax.bar(local_phonemes, normalized, color='cornflowerblue')
+            ax.set_ylim(0, 100)
+            ax.set_ylabel('Frequency (%)')
+            ax.set_title(f'{label} Frequencies (Normalized)')
+            plt.show()
+        print(f"{label} frequencies saved and normalized.")
+
+    finish_button.on_click(normalize_and_plot)
+
+    box = widgets.VBox(list(sliders.values()) + [finish_button, output])
+    display(box)
+
+determine_frequencies(frequency_of_cons, label="Consonant")
+determine_frequencies(frequency_of_vowels, label="Vowel")
+determine_frequencies(frequency_of_syllables, label = "Syllables")
+
+
+print("Please adjust sliders and click 'Finish' for all categories before generating words.")
+
+
+
+
+
+
+#%%
 #region === User Specifications and Output ===
+max_length = int(input("What is the maximum possible length of a word, in syllables?\n"))
 
-#User specifies number of words, max/min length of any word
-#Program outputs plaintext file of randomly generated words seperated by \n
-
-#endregion
+num_words = int(input("How many words do you want outputted?\n"))
 
 
+words = []
+for i in range(num_words):
+    #randomly select number of syllables
+    num_syllables = random.choice(range(1, max_length+1))
+    print(num_syllables)
 
-# Start app
-window.mainloop()
+    #randomly select which syllables & place syllable markers
+    word_structure = []
+    for i in range(num_syllables):
+        if i > 0 and i < num_syllables:
+            word_structure.append(".")
+            word_structure.append(random.choices(list(frequency_of_syllables.keys()), weights = list(frequency_of_syllables.values()), k = 1))
+        else: 
+            word_structure.append(random.choices(list(frequency_of_syllables.keys()), weights = list(frequency_of_syllables.values()), k = 1))
+            
+    print(word_structure)
+
+    #randomly select which consonants take the place of C
+    word_breakdown = []
+    for syllablelist in word_structure: 
+        if syllablelist == ".":
+            word_breakdown.append(".")
+        else: 
+            for syllable in syllablelist: 
+                for character in syllable:
+                    if character == "C":
+                        word_breakdown.append(random.choices(list(frequency_of_cons.keys()), weights = list(frequency_of_cons.values()), k = 1))
+                    if character == "V":
+                        word_breakdown.append(random.choices(list(frequency_of_vowels.keys()), weights = list(frequency_of_vowels.values()), k = 1))
+    print(word_breakdown)
+
+    def flatten_list(nested_list):
+        flat_list = []
+        for item in nested_list:
+            if isinstance(item, list):
+                flat_list.extend(flatten_list(item))
+            else:
+                flat_list.append(item)
+        return flat_list
+    flat_word_breakdown = flatten_list(word_breakdown)
+    print(flat_word_breakdown)
+    
+    word = "".join(flat_word_breakdown)
+    print(word)
+    
+    words.append(word)
+
+#save "words" as a plaintext file
+with open("words.txt", "w", encoding="utf-8") as f:
+    for word in words:
+        f.write(word + "\n")
+
